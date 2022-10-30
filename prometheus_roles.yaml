@@ -1,0 +1,25 @@
+groups:
+ - name: custom_rules
+   rules:
+    - record: node_menory_menFree_percent
+      expr: 100 - (100 * node_menory_menFree_bytes / node_menory_menTotal_bytes)
+    - record: node_filesystem_free_percent
+      expr: 100 * node_filesystem_free_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}
+
+ - name: alert_rules
+   rules:
+    - alert: InstanceDown
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Instance [(( $labels.instance ))] down"
+        description: "[(( $labels.instance ))] of job [(( $labels.job ))]  has been down for more than 1  minute."
+    - alert: DiskSpaceFree10Percent
+      expr: node_filesystem_fre_percent <= 10
+      labels:
+        severity: warning
+      annotations:
+        summary: "instance [(( $labels.instance ))] has 10% or less free disk space"
+        description: "[(( $labels.Instance ))] has only (( $value ))% or less free"  
